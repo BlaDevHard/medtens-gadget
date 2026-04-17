@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "medtens-gadget"
+version = "0.1.0"
+description = "Gadget de desktop para monitoramento MedTens (qualidade de energia)"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "TBD" }
+authors = [{ name = "MedTens" }]
+dependencies = [
+    "PyQt6>=6.6,<7",
+    "pyserial>=3.5,<4",
+    "pyqtgraph>=0.13,<0.14",
+]
+
+[project.scripts]
+medtens-gadget = "medtens_gadget.__main__:main"
+
+[tool.setuptools.packages.find]
+include = ["medtens_gadget*"]
