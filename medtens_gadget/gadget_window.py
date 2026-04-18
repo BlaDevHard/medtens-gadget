@@ -1,13 +1,14 @@
-"""Janela do gadget — frameless, sempre-no-topo, arrastável."""
+"""Janela do gadget — decoração nativa do OS, sempre-no-topo."""
 from __future__ import annotations
 
 import time
 from collections import deque
 
 import pyqtgraph as pg
-from PyQt6.QtCore import Qt, QTimer, QPoint
-from PyQt6.QtGui import QAction, QColor, QFont, QMouseEvent
+from PyQt6.QtCore import Qt, QTimer
+from PyQt6.QtGui import QAction
 from PyQt6.QtWidgets import (
+    QApplication,
     QFrame,
     QHBoxLayout,
     QLabel,
@@ -52,11 +53,12 @@ class GadgetWindow(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowFlags(
-            Qt.WindowType.FramelessWindowHint
+            Qt.WindowType.Window
             | Qt.WindowType.WindowStaysOnTopHint
-            | Qt.WindowType.Tool
+            | Qt.WindowType.WindowMinimizeButtonHint
+            | Qt.WindowType.WindowCloseButtonHint
         )
-        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
+        self.setWindowTitle("MedTens — Antonina-PR")
         self.resize(280, 180)
 
         # Estado
@@ -65,7 +67,6 @@ class GadgetWindow(QWidget):
         self._outage_count = 0
         self._connected = False
         self._last_vrms: float | None = None
-        self._drag_pos: QPoint | None = None
 
         self._build_ui()
 
@@ -89,7 +90,7 @@ class GadgetWindow(QWidget):
         self._card.setStyleSheet(
             """
             QFrame#card {
-                background-color: rgba(17, 24, 39, 220);
+                background-color: #111827;
                 border: 1px solid rgba(255,255,255,30);
                 border-radius: 12px;
             }
@@ -210,27 +211,62 @@ class GadgetWindow(QWidget):
         self._outage_count = 0
         self._outage_label.setText("quedas: 0")
 
-    # ---------- Drag & menu ----------
-    def mousePressEvent(self, e: QMouseEvent) -> None:
-        if e.button() == Qt.MouseButton.LeftButton:
-            self._drag_pos = e.globalPosition().toPoint() - self.frameGeometry().topLeft()
-            e.accept()
+    # ---------- Posicionamento ----------
+    def _snap_to(self, position: str) -> None:
+        screen = QApplication.primaryScreen()
+        if screen is None:
+            return
+        available = screen.availableGeometry()
+        w, h = self.width(), self.height()
+        margin = 16  # px de respiro das bordas
 
-    def mouseMoveEvent(self, e: QMouseEvent) -> None:
-        if self._drag_pos is not None and e.buttons() & Qt.MouseButton.LeftButton:
-            self.move(e.globalPosition().toPoint() - self._drag_pos)
-            e.accept()
+        if position == "top-left":
+            x, y = available.left() + margin, available.top() + margin
+        elif position == "top-right":
+            x, y = available.right() - w - margin, available.top() + margin
+        elif position == "bottom-left":
+            x, y = available.left() + margin, available.bottom() - h - margin
+        elif position == "bottom-right":
+            x, y = available.right() - w - margin, available.bottom() - h - margin
+        elif position == "center":
+            x = available.left() + (available.width() - w) // 2
+            y = available.top() + (available.height() - h) // 2
+        else:
+            return
 
-    def mouseReleaseEvent(self, e: QMouseEvent) -> None:
-        self._drag_pos = None
+        self.move(x, y)
 
+    # ---------- Menu de contexto ----------
     def contextMenuEvent(self, e) -> None:
         menu = QMenu(self)
+
+        pos_menu = menu.addMenu("Posicionar")
+        positions = [
+            ("Canto superior esquerdo", "top-left"),
+            ("Canto superior direito",  "top-right"),
+            ("Canto inferior esquerdo", "bottom-left"),
+            ("Canto inferior direito",  "bottom-right"),
+            ("Centralizar",             "center"),
+        ]
+        for label, key in positions:
+            act = QAction(label, self)
+            act.triggered.connect(lambda _=False, k=key: self._snap_to(k))
+            pos_menu.addAction(act)
+
+        menu.addSeparator()
+
         act_reset = QAction("Resetar contador de quedas", self)
         act_reset.triggered.connect(self.reset_counter)
         menu.addAction(act_reset)
+
         menu.addSeparator()
+
+        act_minimize = QAction("Minimizar", self)
+        act_minimize.triggered.connect(self.showMinimized)
+        menu.addAction(act_minimize)
+
         act_close = QAction("Fechar", self)
         act_close.triggered.connect(self.close)
         menu.addAction(act_close)
+
         menu.exec(e.globalPos())
