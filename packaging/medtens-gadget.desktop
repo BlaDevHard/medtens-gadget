@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=MedTens Gadget
+GenericName=Monitor de Qualidade de Energia
+Comment=Monitor de tensão AC em tempo real (MedTens)
+Exec=medtens-gadget
+Icon=medtens-gadget
+Terminal=false
+Categories=Utility;Monitor;Electronics;
+Keywords=MedTens;tensão;voltagem;PRODIST;energia;monitor;
+StartupNotify=true
+StartupWMClass=medtens-gadget

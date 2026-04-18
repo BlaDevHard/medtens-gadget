@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "medtens-gadget"
-version = "0.2.0"
+version = "0.3.0"
 description = "Gadget de desktop para monitoramento MedTens (qualidade de energia)"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -21,3 +21,6 @@ medtens-gadget = "medtens_gadget.__main__:main"
 
 [tool.setuptools.packages.find]
 include = ["medtens_gadget*"]
+
+[tool.setuptools.package-data]
+medtens_gadget = ["assets/*.svg"]

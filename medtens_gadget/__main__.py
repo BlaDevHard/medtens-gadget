@@ -6,10 +6,28 @@ import os
 import signal
 import sys
 
+from importlib import resources
+
+from PyQt6.QtGui import QIcon
 from PyQt6.QtWidgets import QApplication
 
 from .gadget_window import GadgetWindow
 from .serial_reader import SerialReader
+
+
+def _load_app_icon() -> QIcon:
+    """Carrega o ícone empacotado em medtens_gadget/assets/icon.svg.
+
+    Usa importlib.resources para funcionar tanto em instalação editável
+    quanto em wheel/pip install.
+    """
+    try:
+        path = resources.files("medtens_gadget").joinpath("assets/icon.svg")
+        with resources.as_file(path) as real_path:
+            return QIcon(str(real_path))
+    except (FileNotFoundError, ModuleNotFoundError):
+        # Fallback: ícone do tema do sistema (instalado via .local/share/icons)
+        return QIcon.fromTheme("medtens-gadget")
 
 # Ordem de autodetecção. ACM vem antes porque o Arduino Uno oficial aparece
 # como /dev/ttyACM0 (CDC), enquanto clones com CH340/CP210x aparecem como
@@ -50,8 +68,14 @@ def main() -> int:
 
     app = QApplication(sys.argv)
     app.setQuitOnLastWindowClosed(True)
+    app.setApplicationName("MedTens Gadget")
+    app.setDesktopFileName("medtens-gadget")
+
+    icon = _load_app_icon()
+    app.setWindowIcon(icon)
 
     window = GadgetWindow()
+    window.setWindowIcon(icon)
     reader = SerialReader(port=args.port, baud=args.baud)
     reader.vrms_received.connect(window.on_vrms)
     reader.outage.connect(window.on_outage)

@@ -5,6 +5,28 @@ Todas as mudanças notáveis deste projeto serão documentadas aqui.
 O formato segue [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/)
 e o projeto adere a [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
+## [0.3.0] — 2026-04-18
+
+### Adicionado
+- Ícone próprio em Scalable Vector Graphics (SVG) —
+  `medtens_gadget/assets/icon.svg` — senoide verde + letra "V" em card
+  escuro, harmonizado com o tema do gadget.
+- Carga do ícone em tempo de execução em `__main__.py` via
+  `importlib.resources` (robusto em instalação editável e em wheel),
+  com *fallback* para `QIcon.fromTheme("medtens-gadget")`.
+- `QApplication.setDesktopFileName("medtens-gadget")` para integração
+  correta com barra de tarefas em GNOME/KDE.
+- Arquivos de integração com o ambiente de desktop em `packaging/`:
+  - `medtens-gadget.desktop` — entrada para o menu de aplicações
+  - `install-desktop.sh` — instala ícone em
+    `~/.local/share/icons/hicolor/scalable/apps/` e `.desktop` em
+    `~/.local/share/applications/`.
+- Seção "Integração com o desktop" no `README.md`.
+
+### Alterado
+- `pyproject.toml`: acrescenta `[tool.setuptools.package-data]` para
+  empacotar `assets/*.svg` junto com o código.
+
 ## [0.2.0] — 2026-04-18
 
 ### Adicionado

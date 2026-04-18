@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="256" height="256"
+     viewBox="0 0 256 256"
+     role="img"
+     aria-label="MedTens — monitor de tensão AC">
+  <!-- Fundo arredondado escuro (tema do gadget) -->
+  <rect x="8" y="8" width="240" height="240" rx="40" ry="40"
+        fill="#111827" stroke="#4ade80" stroke-width="4"/>
+
+  <!-- Senoide (onda AC) -->
+  <path d="M 32 140
+           C 56 80, 80 80, 104 140
+           S 152 200, 176 140
+           S 224 80, 248 140"
+        fill="none" stroke="#4ade80" stroke-width="10"
+        stroke-linecap="round"/>
+
+  <!-- Letra V sobreposta, tipografia condensada -->
+  <g transform="translate(128,180)">
+    <path d="M -38 -70 L 0 20 L 38 -70"
+          fill="none" stroke="#e5e7eb" stroke-width="14"
+          stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>
