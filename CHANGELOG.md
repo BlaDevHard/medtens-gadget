@@ -5,6 +5,26 @@ Todas as mudanças notáveis deste projeto serão documentadas aqui.
 O formato segue [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/)
 e o projeto adere a [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
+## [0.4.0] — 2026-04-19
+
+### Adicionado
+- `HttpReader`: leitor HTTP em `QThread` que faz polling de 1 s no
+  endpoint `/json` do ESP-01 e emite os mesmos sinais Qt do
+  `SerialReader` (`vrms_received`, `outage`, `connection_changed`).
+  Permite operar com o UNO alimentado por fonte (sem USB no PC).
+- Flag `--http URL` para forçar modo HTTP e `--http-interval S` para
+  ajustar o período de polling.
+- Autodetecção estendida: se nem `/dev/ttyACM0` nem `/dev/ttyUSB0`
+  existirem, o gadget cai automaticamente para HTTP em
+  `http://192.168.1.18/json` (IP do ESP-01 no DHCP atual).
+- `outage` só é emitido na borda (transição não-queda → queda), evitando
+  reemissão a cada poll enquanto o estado persistir.
+
+### Alterado
+- `autodetect_port()` agora retorna `None` quando nenhuma porta existe,
+  deixando o `__main__` decidir por HTTP. Antes retornava o primeiro
+  candidato mesmo inexistente e deixava o erro para o `SerialReader`.
+
 ## [0.3.0] — 2026-04-18
 
 ### Adicionado
